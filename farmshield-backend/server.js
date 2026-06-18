@@ -42,8 +42,8 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
-// const sensorsRoutes = require('./routes/sensors');
-// app.use('/sensors', sensorsRoutes);
+const sensorsRoutes = require('./routes/sensors');
+app.use('/sensors', sensorsRoutes);
 
 // const stockRoutes = require('./routes/stock');
 // app.use('/stock', stockRoutes);
