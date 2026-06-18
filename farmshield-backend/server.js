@@ -56,23 +56,20 @@ app.get('/', (req, res) => {
 
 // =====================================================
 // ROUTES — REEM
-// Decommente chaque ligne une fois le fichier correspondant cree
 // =====================================================
-// const alertsRoutes = require('./routes/alerts');
-// app.use('/alerts', alertsRoutes);
+const alertsRoutes = require('./routes/alerts');
+app.use('/alerts', alertsRoutes);
 
-// const controlRoutes = require('./routes/control');
-// app.use('/control', controlRoutes);
+const facesRoutes = require('./routes/faces');
+app.use('/faces', facesRoutes);
 
-// const facesRoutes = require('./routes/faces');
-// app.use('/faces', facesRoutes);
+const cameraRoutes = require('./routes/camera');
+app.use('/camera', cameraRoutes);
 
-// const cameraRoutes = require('./routes/camera');
-// app.use('/camera', cameraRoutes);
-
-// ---- MQTT listener (Reem) — tourne en arriere-plan, pas une route ----
-// require('./mqtt/listener');
-
+// MQTT maintenant configure — control et listener actives
+const controlRoutes = require('./routes/control');
+app.use('/control', controlRoutes);
+require('./mqtt/listener');
 // ---- Cron job meteo (ni3ma) — tourne en arriere-plan, pas une route ----
 // require('./weather/cronJob');
 
