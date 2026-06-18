@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Firebase service account key (clé secrète — jamais sur GitHub)
+farmshield-backend/fcm/serviceAccountKey.json
