@@ -45,11 +45,11 @@ app.use('/auth', authRoutes);
 const sensorsRoutes = require('./routes/sensors');
 app.use('/sensors', sensorsRoutes);
 
-// const stockRoutes = require('./routes/stock');
-// app.use('/stock', stockRoutes);
+const stockRoutes = require('./routes/stock');
+app.use('/stock', stockRoutes);
 
-// const irrigationRoutes = require('./routes/irrigation');
-// app.use('/irrigation', irrigationRoutes);
+const irrigationRoutes = require('./routes/irrigation');
+app.use('/irrigation', irrigationRoutes);
 
 const usersRoutes = require('./routes/users');
 app.use('/users', usersRoutes);
