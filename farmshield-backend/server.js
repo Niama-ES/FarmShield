@@ -1,23 +1,6 @@
 /*
   server.js — Point d'entree du backend FarmShield
   ----------------------------------------------------------------
-  Ce fichier est COMMUN. Il assemble toutes les routes (creees par
-  ni3ma et reem chacune dans leurs fichiers respectifs) en un seul
-  serveur Express.
-
-  IMPORTANT : au debut, beaucoup de ces routes n'existent pas encore.
-  Les lignes "require(...)" correspondantes sont commentees ci-dessous.
-  Decommente chaque ligne au fur et a mesure que le fichier de route
-  correspondant est cree, sinon le serveur plantera au demarrage en
-  cherchant un fichier qui n'existe pas encore.
-
-  Pour lancer le serveur :
-      npm install
-      node server.js
-
-  Ou en mode developpement avec rechargement automatique :
-      npm install -g nodemon
-      nodemon server.js
 */
 
 require('dotenv').config();
@@ -73,8 +56,8 @@ app.use('/users', usersRoutes);
 // ---- MQTT listener (Reem) — tourne en arriere-plan, pas une route ----
 // require('./mqtt/listener');
 
-// ---- Cron job meteo (ni3ma) — tourne en arriere-plan, pas une route ----
-// require('./weather/cronJob');
+// ---- Cron job meteo  — tourne en arriere-plan, pas une route ----
+require('./weather/cronJob');
 
 app.listen(PORT, () => {
   console.log(`Serveur FarmShield demarre sur le port ${PORT}`);
