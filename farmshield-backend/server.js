@@ -1,25 +1,3 @@
-/*
-  server.js — Point d'entree du backend FarmShield
-  ----------------------------------------------------------------
-  Ce fichier est COMMUN. Il assemble toutes les routes (creees par
-  ni3ma et reem chacune dans leurs fichiers respectifs) en un seul
-  serveur Express.
-
-  IMPORTANT : au debut, beaucoup de ces routes n'existent pas encore.
-  Les lignes "require(...)" correspondantes sont commentees ci-dessous.
-  Decommente chaque ligne au fur et a mesure que le fichier de route
-  correspondant est cree, sinon le serveur plantera au demarrage en
-  cherchant un fichier qui n'existe pas encore.
-
-  Pour lancer le serveur :
-      npm install
-      node server.js
-
-  Ou en mode developpement avec rechargement automatique :
-      npm install -g nodemon
-      nodemon server.js
-*/
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -35,46 +13,38 @@ app.get('/', (req, res) => {
   res.json({ message: 'FarmShield backend en ligne.' });
 });
 
-// =====================================================
-// ROUTES — NI3MA
-// Decommente chaque ligne une fois le fichier correspondant cree
-// =====================================================
-// const authRoutes = require('./routes/auth');
-// app.use('/auth', authRoutes);
+const authRoutes = require('./routes/auth');
+app.use('/auth', authRoutes);
 
-// const sensorsRoutes = require('./routes/sensors');
-// app.use('/sensors', sensorsRoutes);
+const sensorsRoutes = require('./routes/sensors');
+app.use('/sensors', sensorsRoutes);
 
-// const stockRoutes = require('./routes/stock');
-// app.use('/stock', stockRoutes);
+const stockRoutes = require('./routes/stock');
+app.use('/stock', stockRoutes);
 
-// const irrigationRoutes = require('./routes/irrigation');
-// app.use('/irrigation', irrigationRoutes);
+const irrigationRoutes = require('./routes/irrigation');
+app.use('/irrigation', irrigationRoutes);
 
-// const usersRoutes = require('./routes/users');
-// app.use('/users', usersRoutes);
+const usersRoutes = require('./routes/users');
+app.use('/users', usersRoutes);
 
-// =====================================================
-// ROUTES — REEM
-// Decommente chaque ligne une fois le fichier correspondant cree
-// =====================================================
-// const alertsRoutes = require('./routes/alerts');
-// app.use('/alerts', alertsRoutes);
+const alertsRoutes = require('./routes/alerts');
+app.use('/alerts', alertsRoutes);
 
-// const controlRoutes = require('./routes/control');
-// app.use('/control', controlRoutes);
+const controlRoutes = require('./routes/control');
+app.use('/control', controlRoutes);
 
-// const facesRoutes = require('./routes/faces');
-// app.use('/faces', facesRoutes);
+const facesRoutes = require('./routes/faces');
+app.use('/faces', facesRoutes);
 
-// const cameraRoutes = require('./routes/camera');
-// app.use('/camera', cameraRoutes);
+const cameraRoutes = require('./routes/camera');
+app.use('/camera', cameraRoutes);
 
-// ---- MQTT listener (Reem) — tourne en arriere-plan, pas une route ----
-// require('./mqtt/listener');
+// ---- MQTT listener — tourne en arriere-plan, pas une route ----
+require('./mqtt/listener');
 
-// ---- Cron job meteo (ni3ma) — tourne en arriere-plan, pas une route ----
-// require('./weather/cronJob');
+// ---- Cron job meteo  — tourne en arriere-plan, pas une route ----
+require('./weather/cronJob');
 
 app.listen(PORT, () => {
   console.log(`Serveur FarmShield demarre sur le port ${PORT}`);
