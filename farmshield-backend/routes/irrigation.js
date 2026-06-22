@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const verifierToken = require('../middleware/verifierToken');
+const chargerFerme = require('../middleware/chargerFerme');
+
 
 // GET /irrigation — liste tous les programmes du farmer connecté
-router.get('/', verifierToken, async (req, res) => {
+router.get('/', verifierToken, chargerFerme, async (req, res) => {
   try {
     const resultat = await db.query(
-      'SELECT * FROM irrigation_schedule WHERE user_id = $1 ORDER BY heure_debut ASC',
-      [req.utilisateur.id]
+      'SELECT * FROM irrigation_schedule WHERE ferme_id = $1 ORDER BY heure_debut ASC',
+      [req.fermeId]
     );
     res.json({ programmes: resultat.rows });
   } catch (erreur) {
@@ -18,7 +20,7 @@ router.get('/', verifierToken, async (req, res) => {
 });
 
 // POST /irrigation — créer un nouveau programme
-router.post('/', verifierToken, async (req, res) => {
+router.post('/', verifierToken, chargerFerme, async (req, res) => {
   const { parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu } = req.body;
 
   if (!parcelle || !jour_semaine || !heure_debut || !duree_minutes || !volume_prevu) {
@@ -28,10 +30,10 @@ router.post('/', verifierToken, async (req, res) => {
   try {
     const resultat = await db.query(
       `INSERT INTO irrigation_schedule 
-       (user_id, parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu)
+       (ferme_id, parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [req.utilisateur.id, parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu]
+      [req.fermeId, parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu]
     );
     res.status(201).json({ message: 'Programme créé.', programme: resultat.rows[0] });
   } catch (erreur) {
@@ -41,7 +43,7 @@ router.post('/', verifierToken, async (req, res) => {
 });
 
 // PUT /irrigation/:id — modifier un programme existant
-router.put('/:id', verifierToken, async (req, res) => {
+router.put('/:id', verifierToken, chargerFerme, async (req, res) => {
   const { id } = req.params;
   const { parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu, actif } = req.body;
 
@@ -54,9 +56,9 @@ router.put('/:id', verifierToken, async (req, res) => {
          duree_minutes = COALESCE($4, duree_minutes),
          volume_prevu = COALESCE($5, volume_prevu),
          actif = COALESCE($6, actif)
-       WHERE id = $7 AND user_id = $8
+       WHERE id = $7 AND ferme_id = $8
        RETURNING *`,
-      [parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu, actif, id, req.utilisateur.id]
+      [parcelle, jour_semaine, heure_debut, duree_minutes, volume_prevu, actif, id, req.fermeId]
     );
 
     if (resultat.rows.length === 0) {
@@ -71,13 +73,13 @@ router.put('/:id', verifierToken, async (req, res) => {
 });
 
 // DELETE /irrigation/:id — supprimer un programme
-router.delete('/:id', verifierToken, async (req, res) => {
+router.delete('/:id', verifierToken, chargerFerme, async (req, res) => {
   const { id } = req.params;
 
   try {
     const resultat = await db.query(
-      'DELETE FROM irrigation_schedule WHERE id = $1 AND user_id = $2 RETURNING *',
-      [id, req.utilisateur.id]
+      'DELETE FROM irrigation_schedule WHERE id = $1 AND ferme_id = $2 RETURNING *',
+      [id, req.fermeId]
     );
 
     if (resultat.rows.length === 0) {
@@ -92,16 +94,16 @@ router.delete('/:id', verifierToken, async (req, res) => {
 });
 
 // GET /irrigation/actifs — programmes actifs aujourd'hui (utilisé par le cron job météo)
-router.get('/actifs', verifierToken, async (req, res) => {
+router.get('/actifs', verifierToken, chargerFerme, async (req, res) => {
   const joursMap = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
   const aujourdhui = joursMap[new Date().getDay()];
 
   try {
     const resultat = await db.query(
       `SELECT * FROM irrigation_schedule 
-       WHERE user_id = $1 AND jour_semaine = $2 AND actif = true
+       WHERE ferme_id = $1 AND jour_semaine = $2 AND actif = true
        ORDER BY heure_debut ASC`,
-      [req.utilisateur.id, aujourdhui]
+      [req.fermeId, aujourdhui]
     );
     res.json({ programmes_actifs: resultat.rows });
   } catch (erreur) {

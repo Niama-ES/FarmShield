@@ -11,38 +11,46 @@ async function verifierMeteoEtAjusterIrrigation() {
   console.log('Cron job météo — vérification en cours...');
 
   try {
-    // 1. Appeler l'API météo OpenWeatherMap
-    const reponse = await axios.get(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API_KEY}&units=metric`
-    );
+    // 1. Récupérer toutes les fermes
+    const fermes = await db.query('SELECT * FROM fermes');
 
-    const previsions = reponse.data.list;
+    for (const ferme of fermes.rows) {
+      const lat = ferme.latitude || process.env.OPENWEATHER_LAT;
+      const lon = ferme.longitude || process.env.OPENWEATHER_LON;
 
-    // 2. Chercher s'il va pleuvoir dans les prochaines 24 heures
-    const maintenantPlus24h = Date.now() + 24 * 60 * 60 * 1000;
-
-    const pluiePrevue = previsions.some(prevision => {
-      const heurePrevision = prevision.dt * 1000;
-      const precipitations = prevision.rain ? prevision.rain['3h'] || 0 : 0;
-      return heurePrevision <= maintenantPlus24h && precipitations > 2;
-    });
-
-    console.log(`Pluie prévue dans les 24h : ${pluiePrevue}`);
-
-    // 3. Mettre à jour tous les programmes d'irrigation selon la météo
-    if (pluiePrevue) {
-      await db.query(
-        `UPDATE irrigation_schedule SET actif = false 
-         WHERE actif = true`
+      // 2. Appeler l'API météo pour cette ferme
+      const reponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
       );
-      console.log('Irrigation désactivée automatiquement — pluie prévue.');
-    } else {
-      await db.query(
-        `UPDATE irrigation_schedule SET actif = true 
-         WHERE actif = false`
-      );
-      console.log('Irrigation réactivée — pas de pluie prévue.');
+
+      const previsions = reponse.data.list;
+      const maintenantPlus24h = Date.now() + 24 * 60 * 60 * 1000;
+
+      const pluiePrevue = previsions.some(prevision => {
+        const heurePrevision = prevision.dt * 1000;
+        const precipitations = prevision.rain ? prevision.rain['3h'] || 0 : 0;
+        return heurePrevision <= maintenantPlus24h && precipitations > 2;
+      });
+
+      console.log(`Ferme ${ferme.nom} — Pluie prévue : ${pluiePrevue}`);
+
+      // 3. Mettre à jour uniquement les programmes de cette ferme
+      if (pluiePrevue) {
+        await db.query(
+          `UPDATE irrigation_schedule SET actif = false 
+           WHERE ferme_id = $1 AND actif = true`,
+          [ferme.id]
+        );
+      } else {
+        await db.query(
+          `UPDATE irrigation_schedule SET actif = true 
+           WHERE ferme_id = $1 AND actif = false`,
+          [ferme.id]
+        );
+      }
     }
+
+    console.log('Cron job météo terminé.');
 
   } catch (erreur) {
     console.error('Erreur cron job météo :', erreur.message);

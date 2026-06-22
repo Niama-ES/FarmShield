@@ -2,25 +2,29 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const verifierToken = require('../middleware/verifierToken');
+const chargerFerme = require('../middleware/chargerFerme');
 
 // GET /sensors/status — statut temps réel S1, S2, S3
-router.get('/status', verifierToken, async (req, res) => {
+router.get('/status', verifierToken, chargerFerme, async (req, res) => {
   try {
     const [s1, s2, s3] = await Promise.all([
       db.query(
         `SELECT * FROM sensor_logs 
-         WHERE sous_systeme = 'S1' 
-         ORDER BY created_at DESC LIMIT 1`
+         WHERE sous_systeme = 'S1' AND ferme_id = $1 
+         ORDER BY created_at DESC LIMIT 1`,
+         [req.fermeId]
       ),
       db.query(
         `SELECT * FROM sensor_logs 
-         WHERE sous_systeme = 'S2' 
-         ORDER BY created_at DESC LIMIT 1`
+         WHERE sous_systeme = 'S2' AND ferme_id = $1
+         ORDER BY created_at DESC LIMIT 1`,
+         [req.fermeId]
       ),
       db.query(
         `SELECT * FROM sensor_logs 
-         WHERE sous_systeme = 'S3' 
-         ORDER BY created_at DESC LIMIT 1`
+         WHERE sous_systeme = 'S3' AND ferme_id = $1
+         ORDER BY created_at DESC LIMIT 1`,
+        [req.fermeId]
       )
     ]);
 
@@ -37,7 +41,7 @@ router.get('/status', verifierToken, async (req, res) => {
 });
 
 // GET /sensors/history/:systeme — historique d'un sous-système (20 dernières valeurs)
-router.get('/history/:systeme', verifierToken, async (req, res) => {
+router.get('/history/:systeme', verifierToken, chargerFerme, async (req, res) => {
   const { systeme } = req.params;
 
   const systemesValides = ['S1', 'S2', 'S3'];
@@ -48,10 +52,10 @@ router.get('/history/:systeme', verifierToken, async (req, res) => {
   try {
     const resultat = await db.query(
       `SELECT * FROM sensor_logs 
-       WHERE sous_systeme = $1 
+       WHERE sous_systeme = $1  AND ferme_id = $2
        ORDER BY created_at DESC 
        LIMIT 20`,
-      [systeme.toUpperCase()]
+      [systeme.toUpperCase(), req.fermeId]
     );
 
     res.json({ historique: resultat.rows });

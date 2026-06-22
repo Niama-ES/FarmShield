@@ -1,8 +1,3 @@
-/*
-  server.js — Point d'entree du backend FarmShield
-  ----------------------------------------------------------------
-*/
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -17,10 +12,6 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({ message: 'FarmShield backend en ligne.' });
 });
-
-// =====================================================
-// ROUTES — 1
-// =====================================================
 
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
@@ -37,24 +28,20 @@ app.use('/irrigation', irrigationRoutes);
 const usersRoutes = require('./routes/users');
 app.use('/users', usersRoutes);
 
-// =====================================================
-// ROUTES — 2
-// Decommente chaque ligne une fois le fichier correspondant cree
-// =====================================================
-// const alertsRoutes = require('./routes/alerts');
-// app.use('/alerts', alertsRoutes);
+const alertsRoutes = require('./routes/alerts');
+app.use('/alerts', alertsRoutes);
 
-// const controlRoutes = require('./routes/control');
-// app.use('/control', controlRoutes);
+const controlRoutes = require('./routes/control');
+app.use('/control', controlRoutes);
 
-// const facesRoutes = require('./routes/faces');
-// app.use('/faces', facesRoutes);
+const facesRoutes = require('./routes/faces');
+app.use('/faces', facesRoutes);
 
-// const cameraRoutes = require('./routes/camera');
-// app.use('/camera', cameraRoutes);
+const cameraRoutes = require('./routes/camera');
+app.use('/camera', cameraRoutes);
 
-// ---- MQTT listener (Reem) — tourne en arriere-plan, pas une route ----
-// require('./mqtt/listener');
+// ---- MQTT listener — tourne en arriere-plan, pas une route ----
+require('./mqtt/listener');
 
 // ---- Cron job meteo  — tourne en arriere-plan, pas une route ----
 require('./weather/cronJob');

@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const verifierToken = require('../middleware/verifierToken');
+const chargerFerme = require('../middleware/chargerFerme');
 
 // GET /stock — liste tous les articles de stock du farmer connecté
 router.get('/', verifierToken, async (req, res) => {
   try {
     const resultat = await db.query(
-      'SELECT * FROM stock_items WHERE user_id = $1 ORDER BY created_at DESC',
-      [req.utilisateur.id]
+      'SELECT * FROM stock_items WHERE ferme_id = $1 ORDER BY created_at DESC',
+      [req.fermeId]
     );
     res.json({ stock: resultat.rows });
   } catch (erreur) {
@@ -18,7 +19,7 @@ router.get('/', verifierToken, async (req, res) => {
 });
 
 // POST /stock — ajouter un nouvel article
-router.post('/', verifierToken, async (req, res) => {
+router.post('/', verifierToken, chargerFerme, async (req, res) => {
   const { nom, quantite_initiale, unite, seuil_alerte } = req.body;
 
   if (!nom || !quantite_initiale || !unite || !seuil_alerte) {
@@ -28,10 +29,10 @@ router.post('/', verifierToken, async (req, res) => {
   try {
     const resultat = await db.query(
       `INSERT INTO stock_items 
-       (user_id, nom, quantite_initiale, quantite_actuelle, unite, seuil_alerte) 
+       (ferme_id, nom, quantite_initiale, quantite_actuelle, unite, seuil_alerte) 
        VALUES ($1, $2, $3, $3, $4, $5) 
        RETURNING *`,
-      [req.utilisateur.id, nom, quantite_initiale, unite, seuil_alerte]
+      [req.fermeId, nom, quantite_initiale, unite, seuil_alerte]
     );
     res.status(201).json({ message: 'Article ajouté.', article: resultat.rows[0] });
   } catch (erreur) {
@@ -41,7 +42,7 @@ router.post('/', verifierToken, async (req, res) => {
 });
 
 // PUT /stock/:id — modifier le seuil ou le nom d'un article
-router.put('/:id', verifierToken, async (req, res) => {
+router.put('/:id', verifierToken, chargerFerme, async (req, res) => {
   const { id } = req.params;
   const { nom, seuil_alerte } = req.body;
 
@@ -49,9 +50,9 @@ router.put('/:id', verifierToken, async (req, res) => {
     const resultat = await db.query(
       `UPDATE stock_items 
        SET nom = COALESCE($1, nom), seuil_alerte = COALESCE($2, seuil_alerte)
-       WHERE id = $3 AND user_id = $4
+       WHERE id = $3 AND ferme_id = $4
        RETURNING *`,
-      [nom, seuil_alerte, id, req.utilisateur.id]
+      [nom, seuil_alerte, id, req.fermeId]
     );
 
     if (resultat.rows.length === 0) {
@@ -66,13 +67,13 @@ router.put('/:id', verifierToken, async (req, res) => {
 });
 
 // DELETE /stock/:id — supprimer un article
-router.delete('/:id', verifierToken, async (req, res) => {
+router.delete('/:id', verifierToken, chargerFerme, async (req, res) => {
   const { id } = req.params;
 
   try {
     const resultat = await db.query(
-      'DELETE FROM stock_items WHERE id = $1 AND user_id = $2 RETURNING *',
-      [id, req.utilisateur.id]
+      'DELETE FROM stock_items WHERE id = $1 AND ferme_id = $2 RETURNING *',
+      [id, req.fermeId]
     );
 
     if (resultat.rows.length === 0) {
