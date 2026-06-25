@@ -6,12 +6,18 @@ import { ActivityIndicator, View, Text } from 'react-native';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import colors from './src/theme/colors';
 
+// Screens NI3MA
 import Login from './src/screens/Login';
 import Dashboard from './src/screens/Dashboard';
 import EspaceStockage from './src/screens/EspaceStockage';
 import ProgrammeIrrigation from './src/screens/ProgrammeIrrigation';
 import Statistiques from './src/screens/Statistiques';
 import Parametres from './src/screens/Parametres';
+
+// Screens REEM
+import CarteFerme from './src/screens/CarteFerme';
+import Alertes from './src/screens/Alertes';
+import Controle from './src/screens/Controle';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,10 +39,16 @@ function TabNavigator() {
     >
       <Tab.Screen name="Dashboard" component={Dashboard}
         options={{ tabBarLabel: 'Accueil', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🏠</Text> }} />
+      <Tab.Screen name="Carte" component={CarteFerme}
+        options={{ tabBarLabel: 'Carte', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🗺</Text> }} />
+      <Tab.Screen name="Alertes" component={Alertes}
+        options={{ tabBarLabel: 'Alertes', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🔔</Text> }} />
+      <Tab.Screen name="Controle" component={Controle}
+        options={{ tabBarLabel: 'Contrôle', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🎛</Text> }} />
       <Tab.Screen name="Stock" component={EspaceStockage}
         options={{ tabBarLabel: 'Stock', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📦</Text> }} />
       <Tab.Screen name="Irrigation" component={ProgrammeIrrigation}
-        options={{ tabBarLabel: 'Irrigation', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>💧</Text> }} />
+        options={{ tabBarLabel: 'Eau', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>💧</Text> }} />
       <Tab.Screen name="Statistiques" component={Statistiques}
         options={{ tabBarLabel: 'Stats', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📊</Text> }} />
       <Tab.Screen name="Parametres" component={Parametres}
@@ -47,7 +59,6 @@ function TabNavigator() {
 
 function Navigation() {
   const { token, loading } = useAuth();
-
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
@@ -55,7 +66,6 @@ function Navigation() {
       </View>
     );
   }
-
   return token ? <TabNavigator /> : <Login />;
 }
 
