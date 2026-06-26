@@ -39,24 +39,30 @@ export default function Login() {
   };
 
   const handleRegister = async () => {
-    if (!email || !password || !nomFerme) {
-      Alert.alert('Erreur', 'Tous les champs sont obligatoires.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await apiRegister(email, password, nomFerme, 0, 0);
-      if (data.token) {
-        await login(data.token, data.utilisateur);
+  if (!email || !password || !nomFerme) {
+    Alert.alert('Erreur', 'Tous les champs sont obligatoires.');
+    return;
+  }
+  setLoading(true);
+  try {
+    const data = await apiRegister(email, password, nomFerme, 0, 0);
+    if (data.utilisateur) {
+      // Inscription réussie → connecte-toi automatiquement
+      const loginData = await apiLogin(email, password);
+      if (loginData.token) {
+        await login(loginData.token, loginData.utilisateur);
       } else {
-        Alert.alert('Erreur', data.erreur || 'Inscription échouée.');
+        Alert.alert('Erreur', loginData.erreur || 'Connexion échouée.');
       }
-    } catch (e) {
-      Alert.alert('Erreur', 'Impossible de contacter le serveur.');
-    } finally {
-      setLoading(false);
+    } else {
+      Alert.alert('Erreur', data.erreur || 'Inscription échouée.');
     }
-  };
+  } catch (e) {
+    Alert.alert('Erreur', 'Impossible de contacter le serveur.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <KeyboardAvoidingView
