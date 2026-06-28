@@ -9,6 +9,9 @@
     },
     "ios": {
       "bundleIdentifier": "com.farmshield.app"
-    }
+    },
+    "plugins": [
+      "@rnmapbox/maps"
+    ]
   }
 }

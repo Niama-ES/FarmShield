@@ -119,6 +119,7 @@ dist
 # Firebase cache directory
 .firebase/
 
+
 # TernJS port file
 .tern-port
 
@@ -141,3 +142,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+#fcm notification 
+fcm/serviceAccountKey.json

@@ -8,7 +8,7 @@ import SensorCard from '../components/SensorCard';
 import StatusBadge from '../components/StatusBadge';
 import colors from '../theme/colors';
 
-export default function DetailS2() {
+export default function DetailS2({ navigation }) {
   const { token } = useAuth();
   const [status, setStatus] = useState(null);
   const [history, setHistory] = useState([]);
@@ -59,6 +59,12 @@ export default function DetailS2() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.s2Color} />}
     >
+      <TouchableOpacity 
+        onPress={() => navigation.goBack()} 
+        style={{ padding: 20, paddingTop: 56, paddingBottom: 0 }}
+      >
+        <Text style={{ color: colors.primary, fontSize: 15 }}>← Retour</Text>
+      </TouchableOpacity>
       <View style={styles.header}>
         <Text style={styles.titre}>💧 S2 — Eau & Irrigation</Text>
         <StatusBadge statut={status?.alerte ? 'alerte' : status ? 'ok' : 'hors-ligne'} />

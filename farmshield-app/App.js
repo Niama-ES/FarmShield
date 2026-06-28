@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { ActivityIndicator, View, Text } from 'react-native';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import colors from './src/theme/colors';
@@ -18,8 +19,15 @@ import Parametres from './src/screens/Parametres';
 import CarteFerme from './src/screens/CarteFerme';
 import Alertes from './src/screens/Alertes';
 import Controle from './src/screens/Controle';
+import DetailS1 from './src/screens/DetailS1';
+import DetailS2 from './src/screens/DetailS2';
+import DetailS3 from './src/screens/DetailS3';
+import DetailAlerte from './src/screens/DetailAlerte';
+import CameraLive from './src/screens/CameraLive';
+import UtilisateursAutorises from './src/screens/UtilisateursAutorises';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 function TabNavigator() {
   return (
@@ -57,6 +65,20 @@ function TabNavigator() {
   );
 }
 
+function AppNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Tabs" component={TabNavigator} />
+      <Stack.Screen name="DetailS1" component={DetailS1} />
+      <Stack.Screen name="DetailS2" component={DetailS2} />
+      <Stack.Screen name="DetailS3" component={DetailS3} />
+      <Stack.Screen name="DetailAlerte" component={DetailAlerte} />
+      <Stack.Screen name="CameraLive" component={CameraLive} />
+      <Stack.Screen name="UtilisateursAutorises" component={UtilisateursAutorises} />
+    </Stack.Navigator>
+  );
+}
+
 function Navigation() {
   const { token, loading } = useAuth();
   if (loading) {
@@ -66,7 +88,7 @@ function Navigation() {
       </View>
     );
   }
-  return token ? <TabNavigator /> : <Login />;
+  return token ? <AppNavigator /> : <Login />;
 }
 
 export default function App() {

@@ -1,13 +1,13 @@
 // src/screens/DetailS1.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { getStatus, getHistory } from '../api/sensors';
 import SensorCard from '../components/SensorCard';
 import StatusBadge from '../components/StatusBadge';
 import colors from '../theme/colors';
 
-export default function DetailS1() {
+export default function DetailS1({ navigation }) {
   const { token } = useAuth();
   const [status, setStatus] = useState(null);
   const [history, setHistory] = useState([]);
@@ -39,6 +39,12 @@ export default function DetailS1() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.s1Color} />}
     >
+      <TouchableOpacity 
+        onPress={() => navigation.goBack()} 
+        style={{ padding: 20, paddingTop: 56, paddingBottom: 0 }}
+      >
+        <Text style={{ color: colors.primary, fontSize: 15 }}>← Retour</Text>
+      </TouchableOpacity>
       <View style={styles.header}>
         <Text style={styles.titre}>📦 S1 — Stockage Agricole</Text>
         <StatusBadge statut={status?.alerte ? 'alerte' : status ? 'ok' : 'hors-ligne'} />
