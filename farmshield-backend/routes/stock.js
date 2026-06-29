@@ -5,7 +5,7 @@ const verifierToken = require('../middleware/verifierToken');
 const chargerFerme = require('../middleware/chargerFerme');
 
 // GET /stock — liste tous les articles de stock du farmer connecté
-router.get('/', verifierToken, async (req, res) => {
+router.get('/', verifierToken, chargerFerme, async (req, res) => {
   try {
     const resultat = await db.query(
       'SELECT * FROM stock_items WHERE ferme_id = $1 ORDER BY created_at DESC',

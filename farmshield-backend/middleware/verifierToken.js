@@ -5,7 +5,7 @@ function verifierToken(req, res, next) {
 
   if (!enTete) {
     return res.status(401).json({ erreur: 'Aucun token fourni.' });
-  }
+  } 
 
   const token = enTete.split(' ')[1];
 
