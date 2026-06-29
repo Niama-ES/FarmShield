@@ -26,4 +26,5 @@ export default {
   s1Color: '#E67E22',          // S1 Stockage — orange
   s2Color: '#3498DB',          // S2 Eau — bleu
   s3Color: '#2ECC71',          // S3 Périmètre — vert
+  isDark:        true,
 };

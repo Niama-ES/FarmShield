@@ -5,13 +5,15 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "android": {
-      "package": "com.farmshield.app"
+      "package": "com.farmshield.app",
+      "usesCleartextTraffic": true
     },
     "ios": {
       "bundleIdentifier": "com.farmshield.app"
     },
     "plugins": [
-      "@rnmapbox/maps"
+      "@rnmapbox/maps",
+      "expo-video"
     ]
   }
 }

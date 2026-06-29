@@ -1,36 +1,32 @@
+// src/api/faces.js
 import { API_BASE_URL } from './config';
 
+// ── GET — liste des visages autorisés ────────────────────────────────────────
 export const getVisages = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/faces`, {
+  const res = await fetch(`${API_BASE_URL}/faces`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return await response.json();
+  return res.json();
 };
 
-export const addVisage = async (token, nom, photo_base64) => {
-  const response = await fetch(`${API_BASE_URL}/faces`, {
-    method: 'POST',
+// ── POST — ajouter un visage avec photos base64 ──────────────────────────────
+export const addVisage = async (token, nom, photos_base64 = []) => {
+  const res = await fetch(`${API_BASE_URL}/faces`, {
+    method:  'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization:  `Bearer ${token}`,
     },
-    body: JSON.stringify({ nom, photo_base64 }),
+    body: JSON.stringify({ nom, photos_base64 }),
   });
-  return await response.json();
+  return res.json();
 };
 
-export const bloquerVisage = async (token, id) => {
-  const response = await fetch(`${API_BASE_URL}/faces/${id}/bloquer`, {
-    method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return await response.json();
-};
-
+// ── DELETE — supprimer un visage ─────────────────────────────────────────────
 export const deleteVisage = async (token, id) => {
-  const response = await fetch(`${API_BASE_URL}/faces/${id}`, {
-    method: 'DELETE',
+  const res = await fetch(`${API_BASE_URL}/faces/${id}`, {
+    method:  'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
-  return await response.json();
+  return res.json();
 };
